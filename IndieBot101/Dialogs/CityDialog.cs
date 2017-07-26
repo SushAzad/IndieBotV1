@@ -18,17 +18,17 @@
 
     {
 
-        private string grain;
+        private string name;
 
         private int attempts = 3;
 
 
 
-        public CityDialog(string grain)
+        public CityDialog(string name)
 
         {
 
-            this.grain = grain;
+            this.name = name;
 
         }
 
@@ -38,7 +38,7 @@
 
         {
 
-            await context.PostAsync($" And which City do you want to sell your { this.grain }?");
+            await context.PostAsync($" Which city are you located in, {this.name} ?");
 
 
 
@@ -78,7 +78,7 @@
 
                 {
 
-                    await context.PostAsync("I'm sorry, I don't understand your reply. What City do you want to sell (e.g. 'Wheat')?");
+                    await context.PostAsync("I'm sorry, I don't understand your reply. Which city are you in?");
 
 
 

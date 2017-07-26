@@ -1,5 +1,4 @@
-﻿using System;
-namespace IndieBot101.Dialogs
+﻿namespace IndieBot101.Dialogs
 
 {
 
@@ -15,23 +14,11 @@ namespace IndieBot101.Dialogs
 
     [Serializable]
 
-    public class GrainDialog : IDialog<string>
+    public class OptionDialog : IDialog<string>
 
     {
 
-        private string name;
-
         private int attempts = 3;
-
-
-
-        public GrainDialog(string name)
-
-        {
-
-            this.name = name;
-
-        }
 
 
 
@@ -39,7 +26,7 @@ namespace IndieBot101.Dialogs
 
         {
 
-            await context.PostAsync($"{ this.name }, what product do you want to buy/sell?");
+            await context.PostAsync("Would you like a weather forecast or would you like to buy/sell a product near you?");
 
 
 
@@ -57,6 +44,8 @@ namespace IndieBot101.Dialogs
 
 
 
+            /* If the message returned is a valid name, return it to the calling dialog. */
+
             if ((message.Text != null) && (message.Text.Trim().Length > 0))
 
             {
@@ -69,6 +58,8 @@ namespace IndieBot101.Dialogs
 
             }
 
+            /* Else, try again by re-prompting the user. */
+
             else
 
             {
@@ -79,7 +70,7 @@ namespace IndieBot101.Dialogs
 
                 {
 
-                    await context.PostAsync("I'm sorry, I don't understand your reply. What grain do you want to sell (e.g. 'Wheat')?");
+                    await context.PostAsync("I'm sorry, I don't understand your reply. What is your name (e.g. 'Bill', 'Melinda')?");
 
 
 
@@ -91,7 +82,11 @@ namespace IndieBot101.Dialogs
 
                 {
 
-                    context.Fail(new TooManyAttemptsException("Message was not a valid grain."));
+                    /* Fails the current dialog, removes it from the dialog stack, and returns the exception to the 
+
+                        parent/calling dialog. */
+
+                    context.Fail(new TooManyAttemptsException("Message was not a string or was an empty string."));
 
                 }
 
