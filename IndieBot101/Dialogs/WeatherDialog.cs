@@ -33,24 +33,25 @@
             this.city = city;
 
         }
-
+        //callApi prepends the received json with a data object to enable serialisation when finding location key.
         public static async Task<JObject> callApi(string uri)
         {
             HttpClient httpClient = new HttpClient();
             var json = await httpClient.GetStringAsync(uri);
-            if (json[json.Length - 1] == ']')
-                json = json.Remove(json.Length - 1, 1);
-            if (json[0] == '[')
-                json = json.Remove(0, 1);
-
-            //string trimmedjson = json.Substring(21,14);
-            //Console.WriteLine(trimmedjson);
-            var jsonObj = (JObject)JsonConvert.DeserializeObject(json);
-            Console.WriteLine(jsonObj["Key"]);
+            var newjson = "{'data':" + json + "}";
+            var jsonObj = (JObject)JsonConvert.DeserializeObject(newjson);
             return (jsonObj);
 
         }
+        //callApi2 - the api call with location key already present returns correctly formatted json object - can directly deserialize.
+        public static async Task<JObject> callApi2(string uri)
+        {
+            HttpClient httpClient = new HttpClient();
+            var json = await httpClient.GetStringAsync(uri);
+            var jsonObj = (JObject)JsonConvert.DeserializeObject(json);
+            return (jsonObj);
 
+        }
 
         public async Task StartAsync(IDialogContext context)
 
@@ -59,15 +60,11 @@
             await context.PostAsync($" Getting weather data for {this.city} ...");
             string uri1 = string.Format("http://dataservice.accuweather.com/locations/v1/cities/search?q={0}&apikey={1}", this.city, apiKey);
             var result = await (callApi(uri1));
-            var locationKey = result["Key"];
-            string uri2 = string.Format("http://dataservice.accuweather.com/forecasts/v1/daily/1day/{0}?apikey={1}", locationKey, apiKey);
-            result = await (callApi(uri2));
+            var locationKey = result["data"][0]["Key"].ToString();
+            string uri2 = string.Format("http://dataservice.accuweather.com/forecasts/v1/daily/5day/{0}?apikey={1}", locationKey, apiKey);
+            result = await (callApi2(uri2));
             var weather = result["Headline"]["Text"];
             string weatherResult = "Weather in " + this.city + " is : " + weather;
-
-            //($"In Main {locationKey} \n Weather in {city}: {weather}");
-            
-
             context.Done(weatherResult);
 
 
